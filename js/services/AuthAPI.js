@@ -225,23 +225,30 @@ define(function(require, exports) {
 
     var isPermitted = function (permission) {
         if (!config.userAuthenticationEnabled) {
+            console.warn("User Authentication is not enabled");
             return true;
         }
 
-        if (!permissions()) return false;
-
+        if (!permissions()) {
+            console.error("permissions is not populated.");
+            return false;
+        }
         firstPerm = permission.split(":")[0];
 
         var etalons = [...(permissions()["*"] || []),  ...(permissions()[firstPerm]||[])];
         if (!etalons) {
+            console.error("etalons is not populated")
             return false;
         }
 
         for (var i = 0; i < etalons.length; i++) {
             if (checkPermission(permission, etalons[i])) {
+                console.info(`User has permission: ${permission}`)
                 return true;
             }
         }
+
+        console.warn(`${permission} is not present in etalons: ${etalons}`);
 
         return false;
     };
