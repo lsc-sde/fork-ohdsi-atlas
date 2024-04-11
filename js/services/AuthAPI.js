@@ -78,7 +78,13 @@ define(function(require, exports) {
             url: config.api.url + 'user/me',
             method: 'GET',
             success: function (info, textStatus, jqXHR) {
-                permissions(info.permissionIdx);  // read from permission index of User info
+                const permissionIdx = info.permissions.reduce(function(rv, x) {
+                    key = x.permission.split(":")[0];
+                  (rv[key] = rv[key] || []).push(x.permission);
+                  return rv;
+                }, {});
+
+                permissions(permissionIdx);  // read from permission index of User info
                 subject(info.login);
                 authProvider(jqXHR.getResponseHeader('x-auth-provider'));
                 fullName(info.name ? info.name : info.login);
